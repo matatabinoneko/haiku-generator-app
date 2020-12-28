@@ -1,32 +1,101 @@
 <template>
   <div class="container">
     <div>
-      <Logo />
-      <h1 class="title">app</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
+      <b-form>
+        <b-form-group
+          id="input-group-keyword1"
+          label="keyword1"
+          label-for="input-keyword1"
+          description="キーワードを入力して下さい"
         >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
+          <b-form-input
+            id="input-keyword1"
+            v-model="keyword1"
+            placeholder="keyword1"
+            required
+          ></b-form-input>
+        </b-form-group>
+
+        <b-form-group
+          id="input-group-keyword2"
+          label="keyword2"
+          label-for="input-keyword2"
+          description="キーワードを入力して下さい"
         >
-          GitHub
-        </a>
-      </div>
+          <b-form-input
+            id="input-keyword2"
+            v-model="keyword2"
+            placeholder="keyword2"
+            required
+          ></b-form-input>
+        </b-form-group>
+
+        <b-form-group
+          id="input-group-keyword3"
+          label="keyword3"
+          label-for="input-keyword3"
+          description="キーワードを入力して下さい"
+        >
+          <b-form-input
+            id="input-keyword3"
+            v-model="keyword3"
+            placeholder="keyword3"
+            required
+          ></b-form-input>
+        </b-form-group>
+
+        <b-form-group
+          id="input-group-prefix"
+          label="prefix"
+          label-for="input-prefix"
+          description="上の句を入力して下さい"
+        >
+          <b-form-input
+            id="input-prefix"
+            v-model="prefix"
+            placeholder="prefix"
+            required
+          ></b-form-input>
+        </b-form-group>
+
+        <b-button type="button" variant="primary" @click="get_haiku"
+          >Submit</b-button
+        >
+        <b-button type="reset" variant="danger">Reset</b-button>
+      </b-form>
     </div>
+    <div><display-haiku haiku="haiku" /></div>
   </div>
 </template>
 
 <script>
-export default {}
+import { DisplayHaiku } from '~/components/DisplayHaiku'
+export default {
+  components: {
+    DisplayHaiku,
+  },
+  data: () => {
+    return {
+      keyword1: '',
+      keyword2: '',
+      keyword3: '',
+      prefix: '',
+    }
+  },
+  methods: {
+    get_haiku() {
+      const params = {
+        key1: this.keyword1,
+        key2: this.keyword2,
+        key3: this.keyword3,
+        prefix: this.prefix,
+      }
+      this.$axios.get(`/api/get_haiku`, { params }).then((res) => {
+        console.log(res.data)
+      })
+    },
+  },
+}
 </script>
 
 <style>

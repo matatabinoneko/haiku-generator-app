@@ -19,7 +19,7 @@ def hello():
     return "Hello World"
 
 
-@app.route("/get_haiku", methods=["get"])
+@app.route("/api/get_haiku", methods=["get"])
 def get_haiku():
     key1 = request.args.get("key1", '')
     key2 = request.args.get("key2", '')
