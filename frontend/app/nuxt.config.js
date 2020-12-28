@@ -38,16 +38,13 @@ export default {
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  proxy: { 
+  proxy: {
     '/api': {
-      target: 'http://localhost:5000',
-      pathRewrite: {
-        '^/api': '',
-      },
+      target: 'http://web:5000',
     },
   },
   axios: {
-    // proxy: true,
+    proxy: true,
     prefix: '/api',
   },
 
