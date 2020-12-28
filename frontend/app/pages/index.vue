@@ -90,7 +90,7 @@ export default {
         key3: this.keyword3,
         prefix: this.prefix,
       }
-      this.$axios.get(`/api/get_haiku`, { params }).then((res) => {
+      this.$axios.get(`/get_haiku`, { params }).then((res) => {
         console.log(res.data)
       })
     },
