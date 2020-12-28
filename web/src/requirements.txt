@@ -1,0 +1,5 @@
+Flask == 1.1.2
+torch == 1.4.0
+fairseq == 0.9.0
+typing-extensions == 3.7.4.3
+mecab-python3 == 0.996.5
