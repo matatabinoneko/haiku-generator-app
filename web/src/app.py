@@ -1,5 +1,5 @@
 from generator.haiku_generator import generate_haiku
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 # Flaskとrender_template（HTMLを表示させるための関数）をインポート
 
 
@@ -19,7 +19,7 @@ def hello():
     return "Hello World"
 
 
-@app.route("/get_haiku", methods=["get"])
+@app.route("/api/get_haiku", methods=["get"])
 def get_haiku():
     key1 = request.args.get("key1", '')
     key2 = request.args.get("key2", '')
@@ -27,7 +27,7 @@ def get_haiku():
     prefix = request.args.get("prefix", '')
     app.logger.debug(f"key1:{key1} key2:{key2} key3:{key3} prefix: {prefix}")
     haiku = generate_haiku(key1=key1, key2=key2, key3=key3, prefix=prefix)
-    return f"key:{key1}, {key2}, {key3}\nprefix: {prefix}\noutput: {haiku}"
+    return {'haiku': haiku}
 
 
 if __name__ == "__main__":

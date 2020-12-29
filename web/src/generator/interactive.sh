@@ -1,6 +1,5 @@
-### interactive script ###
-. generator/setting.sh
-#CUDA_VISIBLE_DEVICES=${GPU} fairseq-interactive ${DATA_DIR} \
+MODEL_DIR="models"
+DATA_DIR="data/preprocessed"
 python generator/interactive-for-japanese.py ${DATA_DIR} \
 	--path ${MODEL_DIR}/checkpoint_best.pt \
 	--source-lang source \
