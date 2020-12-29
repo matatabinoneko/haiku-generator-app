@@ -76,7 +76,7 @@
       </div>
     </div>
     <div class="row justify-content-center my-5">
-      <div class="col-sm-6">
+      <div class="col-sm-6 d-flex justify-content-center">
         <display-haiku v-if="showHaiku" :haiku="haiku" />
       </div>
     </div>
@@ -84,8 +84,8 @@
 </template>
 
 <script>
-import { DisplayHaiku } from '~/components/DisplayHaiku'
-import { Introduction } from '~/components/Introduction'
+import DisplayHaiku from '~/components/DisplayHaiku'
+import Introduction from '~/components/Introduction'
 export default {
   components: {
     DisplayHaiku,
@@ -140,7 +140,7 @@ export default {
         prefix: this.prefix,
       }
       this.$axios
-        .get(`/get_haiku`, { params })
+        .get('/get_haiku', { params })
         .then((res) => {
           this.haiku = res.data.haiku
           this.isRequest = false
