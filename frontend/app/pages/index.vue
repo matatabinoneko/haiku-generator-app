@@ -153,23 +153,15 @@ export default {
     },
     isJapaneseWord(str) {
       // 日本語であるかを判定
-      if (
+      return (
         str === '' ||
         str.match(/^[\u30A0-\u30FF\u3040-\u309F\u3005-\u3006\u30E0-\u9FCF]+$/)
-      ) {
-        return true
-      } else {
-        return false
-      }
+      )
     },
 
     isValidLength(str) {
       // 日本語で5文字以内か検証
-      if (str.length <= 5) {
-        return true
-      } else {
-        return false
-      }
+      return str.length <= 5
     },
   },
 }
