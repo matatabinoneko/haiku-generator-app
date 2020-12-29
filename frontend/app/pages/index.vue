@@ -1,78 +1,95 @@
 <template>
   <div class="container">
-    <div>
-      <b-form>
-        <b-form-group
-          id="input-group-keyword1"
-          label="keyword1"
-          label-for="input-keyword1"
-          description="キーワードを入力して下さい"
-        >
-          <b-form-input
-            id="input-keyword1"
-            v-model="keyword1"
-            placeholder="keyword1"
-            required
-          ></b-form-input>
-        </b-form-group>
+    <Introduction class="mt-5" />
+    <div class="row">
+      <div class="col col-sm-12 px-0">
+        <b-form>
+          <b-card bg-variant="light">
+            <b-form-group
+              class="mb-0"
+              description="ローマ字や数字，記号は入力できません"
+            >
+              <b-form-group
+                label="キーワード:"
+                label-cols-sm="3"
+                label-align-sm="right"
+              >
+                <b-form-input
+                  id="keyword1"
+                  v-model="keyword1"
+                  required
+                ></b-form-input>
+              </b-form-group>
 
-        <b-form-group
-          id="input-group-keyword2"
-          label="keyword2"
-          label-for="input-keyword2"
-          description="キーワードを入力して下さい"
-        >
-          <b-form-input
-            id="input-keyword2"
-            v-model="keyword2"
-            placeholder="keyword2"
-            required
-          ></b-form-input>
-        </b-form-group>
+              <b-form-group
+                label="キーワード:"
+                label-cols-sm="3"
+                label-align-sm="right"
+              >
+                <b-form-input
+                  id="keyword2"
+                  v-model="keyword2"
+                  required
+                ></b-form-input>
+              </b-form-group>
 
-        <b-form-group
-          id="input-group-keyword3"
-          label="keyword3"
-          label-for="input-keyword3"
-          description="キーワードを入力して下さい"
-        >
-          <b-form-input
-            id="input-keyword3"
-            v-model="keyword3"
-            placeholder="keyword3"
-            required
-          ></b-form-input>
-        </b-form-group>
+              <b-form-group
+                label="キーワード:"
+                label-cols-sm="3"
+                label-align-sm="right"
+              >
+                <b-form-input
+                  id="keyword3"
+                  v-model="keyword3"
+                  required
+                ></b-form-input>
+              </b-form-group>
 
-        <b-form-group
-          id="input-group-prefix"
-          label="prefix"
-          label-for="input-prefix"
-          description="上の句を入力して下さい"
-        >
-          <b-form-input
-            id="input-prefix"
-            v-model="prefix"
-            placeholder="prefix"
-            required
-          ></b-form-input>
-        </b-form-group>
+              <b-form-group
+                label="上の句:"
+                label-cols-sm="3"
+                label-align-sm="right"
+              >
+                <b-form-input
+                  id="prefix"
+                  v-model="prefix"
+                  required
+                ></b-form-input>
+              </b-form-group>
+            </b-form-group>
 
-        <b-button type="button" variant="primary" @click="get_haiku"
-          >Submit</b-button
-        >
-        <b-button type="reset" variant="danger">Reset</b-button>
-      </b-form>
+            <b-alert :show="errorMessage !== null" variant="warning">{{
+              errorMessage
+            }}</b-alert>
+            <div class="float-right">
+              <b-button
+                type="button"
+                variant="success"
+                :disabled="isRequest"
+                @click="get_haiku"
+                >ここで一句</b-button
+              >
+              <b-button type="reset" variant="danger">リセット</b-button>
+            </div>
+          </b-card>
+        </b-form>
+      </div>
     </div>
-    <div><display-haiku haiku="haiku" /></div>
+    <div class="row justify-content-center my-5">
+      <div class="col-sm-6">
+        <display-haiku v-if="showHaiku" :haiku="haiku" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { DisplayHaiku } from '~/components/DisplayHaiku'
+import { Introduction } from '~/components/Introduction'
 export default {
   components: {
     DisplayHaiku,
+    Introduction,
   },
   data: () => {
     return {
@@ -80,53 +97,80 @@ export default {
       keyword2: '',
       keyword3: '',
       prefix: '',
+      haiku: null,
+      errorMessage: null,
+      isRequest: false,
+      showHaiku: false,
     }
   },
   methods: {
     get_haiku() {
+      // ボタン連打を回避
+      this.isRequest = true
+
+      // keywordとprefixが日本語かを確認
+      if (
+        !(
+          this.isJapaneseWord(this.keyword1) &&
+          this.isJapaneseWord(this.keyword2) &&
+          this.isJapaneseWord(this.keyword3) &&
+          this.isJapaneseWord(this.prefix)
+        )
+      ) {
+        this.errorMessage = '日本語を入力してください'
+        this.isRequest = false
+        return
+      }
+
+      // prefixが5文字以内かを確認
+      if (!this.isValidLength(this.prefix)) {
+        this.errorMessage = '上の句は5文字以内にして下さい'
+        this.isRequest = false
+        return
+      }
+
+      this.errorMessage = null
+      this.haiku = ''
+      this.showHaiku = true
+
       const params = {
         key1: this.keyword1,
         key2: this.keyword2,
         key3: this.keyword3,
         prefix: this.prefix,
       }
-      this.$axios.get(`/get_haiku`, { params }).then((res) => {
-        console.log(res.data)
-      })
+      this.$axios
+        .get(`/get_haiku`, { params })
+        .then((res) => {
+          this.haiku = res.data.haiku
+          this.isRequest = false
+        })
+        .catch(() => {
+          this.errorMessage = 'エラーが発生しました'
+          this.showHaiku = false
+          this.isRequest = false
+        })
+    },
+    isJapaneseWord(str) {
+      // 日本語であるかを判定
+      if (
+        str === '' ||
+        str.match(/^[\u30A0-\u30FF\u3040-\u309F\u3005-\u3006\u30E0-\u9FCF]+$/)
+      ) {
+        return true
+      } else {
+        return false
+      }
+    },
+
+    isValidLength(str) {
+      // 日本語で5文字以内か検証
+      if (str.length <= 5) {
+        return true
+      } else {
+        return false
+      }
     },
   },
 }
 </script>
-
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
-</style>

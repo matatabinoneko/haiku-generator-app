@@ -4,6 +4,7 @@ import sys
 from typing import List
 import MeCab
 import random
+import re
 
 logger = logging.getLogger("app")
 
@@ -12,12 +13,14 @@ def word_tokenizer(x): return m.parse(x).rstrip("\n").split()
 def char_tokenizer(x): return list(x)
 
 
+japanese_pattern = re.compile(r'[ぁ-んァ-ン一-龥]+')
+
 dup_threshold = 0.8
 
 
 def calc_score(haiku: str) -> float:
     '''
-    スコア計算
+    重複度スコア計算
     '''
     word_tokens = word_tokenizer(haiku)
     char_tokens = char_tokenizer(haiku)
@@ -28,6 +31,10 @@ def calc_score(haiku: str) -> float:
 
 
 def generate_haiku(key1: str, key2: str, key3: str, prefix: str) -> str:
+    # 日本語判定 + 文字数判定
+    if not is_japanese(key1) or not is_japanese(key2) or not is_japanese(key3) or not is_japanese(prefix) or 5 < len(prefix):
+        raise ValueError
+
     key1 = ' '.join(list(key1))
     key2 = ' '.join(list(key2))
     key3 = ' '.join(list(key3))
@@ -44,22 +51,16 @@ def generate_haiku(key1: str, key2: str, key3: str, prefix: str) -> str:
 
     logger.debug(inputs)
 
+    # subprocessでinteractive.shを実行
     cmd0 = f"echo '{inputs}'"
     cmd1 = '|bash generator/interactive.sh'
     cmd2 = "| grep output:"
-    # cmd3 = "| tr -s ' ' "
-    # cmd4 = "| cut -d ' ' -f 1"
-    hoge = subprocess.run(f"{cmd0} {cmd1} {cmd2}",
-                          shell=True, stdout=subprocess.PIPE)
-    hoge = hoge.stdout.decode('utf8').strip().split('\n')
+    outputs = subprocess.run(f"{cmd0} {cmd1} {cmd2}",
+                             shell=True, stdout=subprocess.PIPE)
+    outputs = outputs.stdout.decode('utf8').strip().split('\n')
 
-    # outputs = []
-    # for ppl_output in hoge:
-    #     logger.debug(ppl_output)
-    #     ppl, output = ppl_output.split('\t')
-    #     ppl = float(ppl.replace('output: ', ''))
-    #     outputs.append([ppl, output])
-    outputs = list(map(lambda x: x.split('\t'), hoge))
+    # output:Array(ppl, 俳句)
+    outputs = list(map(lambda x: x.split('\t'), outputs))
     logger.debug(outputs)
 
     suffix = select_best_haiku_from_candidate(outputs)
@@ -104,3 +105,13 @@ def select_best_haiku_from_candidate(haiku_list: List) -> str:
         haiku = random.choice(haiku_list)[1]
 
     return haiku
+
+
+def is_japanese(word):
+    '''
+    wordが空文字または日本語であればtrueを返す
+    '''
+    if word == '' or japanese_pattern.fullmatch(word):
+        return True
+    else:
+        return False

@@ -7,8 +7,6 @@ services:
         command: sh ./start.sh
         expose:
             - 5000
-        ports:
-            - 5000:5000
         volumes:
             - ./web/src:/app
         environment:
