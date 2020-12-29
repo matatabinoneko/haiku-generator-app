@@ -50,7 +50,7 @@ export default {
   right: 50%; */
   padding: 6px;
   display: block;
-  transform: translate(50%, 0%);
+  /* transform: translate(50%, 0%); */
   background-image: linear-gradient(
     to top left,
     #f7de06,

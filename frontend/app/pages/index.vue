@@ -76,7 +76,7 @@
       </div>
     </div>
     <div class="row justify-content-center my-5">
-      <div class="col-sm-6">
+      <div class="col-sm-6 d-flex justify-content-center">
         <display-haiku v-if="showHaiku" :haiku="haiku" />
       </div>
     </div>
