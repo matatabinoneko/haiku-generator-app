@@ -1,0 +1,32 @@
+version: "3"
+services:
+    web:
+        build:
+            dockerfile: Dockerfile
+            context: ./web
+        command: sh ./start.sh
+        expose:
+            - 5000
+        volumes:
+            - ./web/src:/app
+        environment:
+            FLASK_ENV: development
+
+    frontend:
+        build:
+            dockerfile: Dockerfile
+            context: ./frontend
+        tty: true
+        volumes:
+            - ./frontend/app:/app
+            - /app/node_modules
+        command: yarn dev
+        environment:
+            CHOKIDAR_USEPOLLING: "true"
+            # API_URL: "http://localhost:5000"
+        expose:
+            - "3000"
+        ports:
+            - 3000:3000
+        depends_on:
+            - web
